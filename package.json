@@ -1,0 +1,40 @@
+{
+  "name": "follow-anonymous",
+  "version": "0.1.0",
+  "description": "匿名监听微博/抖音/QQ空间主页更新并推送的桌面客户端",
+  "main": "electron/main.js",
+  "author": "kunjinkao55",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "postinstall": "electron-builder install-app-deps",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.followanonymous.app",
+    "productName": "FollowAnonymous",
+    "files": [
+      "electron/**/*",
+      "lib/**/*",
+      "providers/**/*",
+      "src/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  },
+  "devDependencies": {
+    "electron": "^43.4.0",
+    "electron-builder": "^26.15.3"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "node-cron": "^4.6.0",
+    "nodemailer": "^9.0.5",
+    "playwright": "^1.62.1"
+  }
+}

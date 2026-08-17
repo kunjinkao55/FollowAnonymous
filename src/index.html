@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self'; img-src * data:; connect-src *;"
+    />
+    <title>FollowAnonymous</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div class="brand">
+          <span class="brand-mark">F</span>
+          <span class="brand-title">FollowAnonymous</span>
+          <span class="brand-sub">社交媒体更新匿名监听</span>
+        </div>
+        <nav class="tabs">
+          <button class="tab-btn active" data-view="profiles">主页管理</button>
+          <button class="tab-btn" data-view="notifications">
+            消息中心 <span id="unread-badge" class="badge hide">0</span>
+          </button>
+          <button class="tab-btn" data-view="settings">设置</button>
+        </nav>
+        <div class="header-actions">
+          <button id="btn-check-all" class="btn btn-primary">立即检查全部</button>
+        </div>
+      </header>
+
+      <main>
+        <!-- 主页管理 -->
+        <section id="view-profiles" class="view active">
+          <div class="add-bar card">
+            <input
+              id="input-url"
+              type="text"
+              placeholder="粘贴微博 / 抖音 / QQ空间 主页链接，例如 weibo.com/u/1234567890"
+              autocomplete="off"
+            />
+            <button id="btn-add" class="btn btn-primary">添加主页</button>
+          </div>
+          <div id="add-status" class="status-line"></div>
+          <div id="profile-list" class="list"></div>
+        </section>
+
+        <!-- 消息中心 -->
+        <section id="view-notifications" class="view">
+          <div class="toolbar">
+            <span class="muted" id="notif-count"></span>
+            <button id="btn-mark-read" class="btn">标记全部已读</button>
+          </div>
+          <div id="notif-list" class="list"></div>
+        </section>
+
+        <!-- 设置 -->
+        <section id="view-settings" class="view">
+          <div class="card settings-card">
+            <h3>轮询设置</h3>
+            <label class="row">
+              <span>检查间隔（分钟）</span>
+              <input id="set-interval" type="number" min="5" max="1440" />
+            </label>
+            <label class="row">
+              <span>间隔随机抖动（分钟，防止请求规律被识别）</span>
+              <input id="set-jitter" type="number" min="0" max="120" />
+            </label>
+          </div>
+
+          <div class="card settings-card">
+            <h3>SMTP 邮件推送</h3>
+            <label class="row">
+              <span>启用邮件推送</span>
+              <input id="set-smtp-enabled" type="checkbox" />
+            </label>
+            <label class="row">
+              <span>SMTP 服务器</span>
+              <input id="set-smtp-host" type="text" placeholder="smtp.qq.com" />
+            </label>
+            <label class="row">
+              <span>端口</span>
+              <input id="set-smtp-port" type="number" value="465" />
+            </label>
+            <label class="row">
+              <span>SSL/TLS</span>
+              <input id="set-smtp-secure" type="checkbox" checked />
+            </label>
+            <label class="row">
+              <span>账号</span>
+              <input id="set-smtp-user" type="text" placeholder="your@qq.com" />
+            </label>
+            <label class="row">
+              <span>授权码/密码</span>
+              <input id="set-smtp-pass" type="password" placeholder="保密存储在本机" />
+            </label>
+            <label class="row">
+              <span>发件人显示</span>
+              <input id="set-smtp-from" type="text" placeholder="留空则用账号" />
+            </label>
+            <label class="row">
+              <span>收件人</span>
+              <input id="set-smtp-to" type="text" placeholder="留空则发给账号" />
+            </label>
+            <label class="row">
+              <span>合并发送间隔（分钟，多条更新合并一封）</span>
+              <input id="set-smtp-batch" type="number" min="1" max="1440" />
+            </label>
+            <div class="btn-row">
+              <button id="btn-save-settings" class="btn btn-primary">保存设置</button>
+              <button id="btn-test-smtp" class="btn">发送测试邮件</button>
+              <span id="settings-status" class="status-line"></span>
+            </div>
+          </div>
+
+          <div class="card settings-card">
+            <h3>代理（可选，用于规避IP级限流）</h3>
+            <label class="row">
+              <span>启用代理</span>
+              <input id="set-proxy-enabled" type="checkbox" />
+            </label>
+            <label class="row">
+              <span>代理地址</span>
+              <input id="set-proxy-url" type="text" placeholder="http://user:pass@host:port" />
+            </label>
+          </div>
+
+          <div class="card settings-card">
+            <h3>运行行为</h3>
+            <label class="row">
+              <span>关闭窗口时后台继续运行（托盘）</span>
+              <input id="set-close-tray" type="checkbox" />
+            </label>
+            <label class="row">
+              <span>新更新时显示桌面系统通知</span>
+              <input id="set-system-notif" type="checkbox" checked />
+            </label>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="posts-dialog">
+      <div class="dialog-head">
+        <span id="dialog-title"></span>
+        <button id="dialog-close" class="btn">关闭</button>
+      </div>
+      <div id="dialog-body" class="list"></div>
+    </dialog>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>
