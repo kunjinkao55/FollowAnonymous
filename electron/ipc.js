@@ -24,6 +24,7 @@ const CHANNELS = [
   'settings:testSmtp',
   'notifications:list',
   'notifications:markRead',
+  'notifications:clear',
   'notifications:unread',
 ];
 
@@ -71,6 +72,7 @@ function register() {
 
   ipcMain.handle('notifications:list', (e, limit) => db.listNotifications(limit || 200));
   ipcMain.handle('notifications:markRead', (e, ids) => db.markNotificationsRead(ids));
+  ipcMain.handle('notifications:clear', () => db.clearNotifications());
   ipcMain.handle('notifications:unread', () => db.countUnread());
 
   if (events.listenerCount('notification:new') === 0) {

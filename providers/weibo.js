@@ -136,7 +136,10 @@ class WeiboProvider extends BaseProvider {
 
             const userInfo = profileJson?.body?.data?.userInfo || null;
             const cards = (listJson || profileJson)?.body?.data?.cards || [];
-            const mblogs = extractMblogs(cards);
+            let mblogs = extractMblogs(cards);
+            mblogs = mblogs.filter(
+              (mb) => !mb.user?.id || String(mb.user.id) === String(profile.uid)
+            );
 
             if (!mblogs.length) {
               throw new ProviderError('未能获取到该微博主页的内容（可能未对游客开放）', {

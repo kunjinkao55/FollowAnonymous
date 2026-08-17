@@ -17,6 +17,7 @@ contextBridge.exposeInMainWorld('api', {
   notifications: {
     list: (limit) => ipcRenderer.invoke('notifications:list', limit),
     markRead: (ids) => ipcRenderer.invoke('notifications:markRead', ids),
+    clear: () => ipcRenderer.invoke('notifications:clear'),
     unread: () => ipcRenderer.invoke('notifications:unread'),
   },
   on: (channel, cb) => {

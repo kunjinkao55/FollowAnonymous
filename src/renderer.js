@@ -56,6 +56,12 @@ function bindActions() {
     await loadNotifications();
     refreshUnread();
   });
+  $('#btn-clear-notif').addEventListener('click', async () => {
+    if (!confirm('确定清空所有消息记录吗？')) return;
+    await window.api.notifications.clear();
+    await loadNotifications();
+    refreshUnread();
+  });
   $('#btn-save-settings').addEventListener('click', saveSettings);
   $('#btn-test-smtp').addEventListener('click', testSmtp);
   document.getElementById('dialog-close').addEventListener('click', () => {

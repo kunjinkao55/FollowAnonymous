@@ -114,22 +114,23 @@ class DouyinProvider extends BaseProvider {
         });
       }
 
-      let items = await this._collectPosts(page, captured, 12000);
+      let items = this._ownItems(
+        this._dedupe(await this._collectPosts(page, captured, 12000)),
+        profile.uid
+      );
 
       // Anonymous visitors may get a cached post list; reload once to pull the freshest copy.
       if (items.length) {
         await page.reload({ waitUntil: 'domcontentloaded', timeout: 35000 }).catch(() => {});
         await this._collectPosts(page, captured, 8000);
-        items = this._fromCaptured(captured);
+        items = this._ownItems(this._dedupe(this._fromCaptured(captured)), profile.uid);
       }
 
-      items = this._dedupe(items);
-
       if (!items.length) {
-        items = await this._fromSsr(page).catch(() => []);
+        items = this._ownItems(await this._fromSsr(page).catch(() => []), profile.uid);
       }
       if (!items.length) {
-        items = await this._fromDom(page);
+        items = this._ownItems(await this._fromDom(page), profile.uid);
       }
       if (!items.length) {
         throw new ProviderError('未能获取到该主页的作品列表（可能未对游客开放或风控拦截）', {
@@ -194,6 +195,16 @@ class DouyinProvider extends BaseProvider {
     return [];
   }
 
+  /** Keep only items authored by the monitored user (drops recommended content from others). */
+  _ownItems(items, targetUid) {
+    if (!targetUid) return items || [];
+    return (items || []).filter((i) => {
+      const s = i.sec_uid || i.author?.sec_uid || i.author?.user?.sec_uid || '';
+      if (!s) return true; // no authorship info (e.g. DOM fallback) -> keep
+      return s === targetUid;
+    });
+  }
+
   _dedupe(items) {
     const map = new Map();
     for (const i of items || []) {
@@ -222,6 +233,7 @@ class DouyinProvider extends BaseProvider {
       create_time: i.create_time || i.createTime || i.create_times,
       desc: i.desc ?? i.name ?? '',
       author: i.author?.nickname || i.nickname || i.author?.user?.nickname || '',
+      sec_uid: i.author?.sec_uid || i.author?.user?.sec_uid || '',
       video: i.video || i.videoInfo || {},
       cover: i.cover,
       images: i.images || i.imagePostInfo?.images,
@@ -248,6 +260,7 @@ class DouyinProvider extends BaseProvider {
           create_time: 0,
           cover: img?.src || '',
           author: '',
+          sec_uid: '',
         });
       }
       return out;
